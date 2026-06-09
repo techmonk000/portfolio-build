@@ -132,20 +132,22 @@ section {
   min-height: 100vh;
 }
 
-/* ScrollSmoother — wrapper is fixed, content scrolls inside it */
-#smooth-wrapper {
-  overflow: hidden;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-}
+/* ScrollSmoother — desktop only; mobile uses native scroll */
+@media (pointer: fine) {
+  #smooth-wrapper {
+    overflow: hidden;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
 
-#smooth-content {
-  overflow: visible;
-  width: 100%;
-  will-change: transform;
+  #smooth-content {
+    overflow: visible;
+    width: 100%;
+    will-change: transform;
+  }
 }
 
 /* Reveal base states — GSAP will animate these */

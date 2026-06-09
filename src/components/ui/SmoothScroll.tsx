@@ -10,21 +10,25 @@ export default function SmoothScroll() {
   const ctx = useRef<gsap.Context | null>(null);
 
   useEffect(() => {
-    // Small delay so DOM is fully painted after BootScreen fade
     const timer = setTimeout(() => {
       ctx.current = gsap.context(() => {
 
-        // ── ScrollSmoother ─────────────────────────────────────────────
-        ScrollSmoother.create({
-          wrapper: "#smooth-wrapper",
-          content: "#smooth-content",
-          smooth: 0.9,
-          effects: true,
-          normalizeScroll: true,
-          onUpdate: () => ScrollTrigger.update(),
-        });
+        // ── ScrollSmoother — desktop only ──────────────────────────────
+        // normalizeScroll on touch devices causes jitter/vibration feedback
+        // loop. Only enable smooth scrolling on non-touch (pointer: fine).
+        const isTouch = window.matchMedia("(pointer: coarse)").matches;
 
-        // Refresh after smoother is ready so ScrollTrigger positions are accurate
+        if (!isTouch) {
+          ScrollSmoother.create({
+            wrapper: "#smooth-wrapper",
+            content: "#smooth-content",
+            smooth: 0.9,
+            effects: true,
+            normalizeScroll: false,
+            onUpdate: () => ScrollTrigger.update(),
+          });
+        }
+
         ScrollTrigger.refresh();
 
         // ── Stagger reveal helpers ──────────────────────────────────────
