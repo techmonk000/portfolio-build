@@ -1,6 +1,6 @@
 "use client";
 import { useRef, useMemo } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Html } from "@react-three/drei";
 import * as THREE from "three";
 
@@ -282,6 +282,23 @@ function Scene() {
   );
 }
 
+// ── Responsive camera — pulls back on narrow screens ─────────────────────────
+function ResponsiveCamera() {
+  const { camera, size } = useThree();
+  useFrame(() => {
+    const isMobile = size.width < 600;
+    const targetZ = isMobile ? 12 : 8.5;
+    const targetFov = isMobile ? 64 : 56;
+    const cam = camera as THREE.PerspectiveCamera;
+    cam.position.z += (targetZ - cam.position.z) * 0.05;
+    if (Math.abs(cam.fov - targetFov) > 0.1) {
+      cam.fov += (targetFov - cam.fov) * 0.05;
+      cam.updateProjectionMatrix();
+    }
+  });
+  return null;
+}
+
 // ── Export ────────────────────────────────────────────────────────────────────
 export default function CyberOSArch() {
   return (
@@ -291,6 +308,7 @@ export default function CyberOSArch() {
       style={{ background: "transparent", width: "100%", height: "100%" }}
       dpr={[1, 1.5]}
     >
+      <ResponsiveCamera />
       <ambientLight intensity={0.3} />
       <pointLight position={[2, 3, 4]}   intensity={2} color="#7dcfff" />
       <pointLight position={[-2, -3, 3]} intensity={1.5} color="#f7768e" />
