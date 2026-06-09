@@ -186,12 +186,13 @@ function Scene() {
 
   useFrame((state) => {
     if (!groupRef.current) return;
-    // Gentle sway only — diagram is 2D so deep rotation would hide labels
     groupRef.current.rotation.y = Math.sin(state.clock.elapsedTime * 0.18) * 0.14;
     groupRef.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.12) * 0.04;
   });
 
   return (
+    <>
+    <ResponsiveScale groupRef={groupRef} />
     <group ref={groupRef}>
       {/* Divider + label */}
       <Divider />
@@ -279,22 +280,18 @@ function Scene() {
       <Packet from={NODES.gbt}       to={NODES.findings}  delay={1.6}  color={C.gbm} />
       <Packet from={NODES.findings}  to={NODES.shell}     delay={2.0}  color={C.kernel} />
     </group>
+    </>
   );
 }
 
-// ── Responsive camera — pulls back on narrow screens ─────────────────────────
-function ResponsiveCamera() {
-  const { camera, size } = useThree();
+// ── Responsive scene scale — shrinks on narrow screens ───────────────────────
+function ResponsiveScale({ groupRef }: { groupRef: React.RefObject<THREE.Group | null> }) {
+  const { size } = useThree();
   useFrame(() => {
-    const isMobile = size.width < 600;
-    const targetZ = isMobile ? 12 : 8.5;
-    const targetFov = isMobile ? 64 : 56;
-    const cam = camera as THREE.PerspectiveCamera;
-    cam.position.z += (targetZ - cam.position.z) * 0.05;
-    if (Math.abs(cam.fov - targetFov) > 0.1) {
-      cam.fov += (targetFov - cam.fov) * 0.05;
-      cam.updateProjectionMatrix();
-    }
+    if (!groupRef.current) return;
+    // Scale down proportionally on mobile so wide diagram fits without going tiny
+    const target = size.width < 420 ? 0.62 : size.width < 600 ? 0.74 : 1.0;
+    groupRef.current.scale.lerp(new THREE.Vector3(target, target, target), 0.06);
   });
   return null;
 }
@@ -308,7 +305,6 @@ export default function CyberOSArch() {
       style={{ background: "transparent", width: "100%", height: "100%" }}
       dpr={[1, 1.5]}
     >
-      <ResponsiveCamera />
       <ambientLight intensity={0.3} />
       <pointLight position={[2, 3, 4]}   intensity={2} color="#7dcfff" />
       <pointLight position={[-2, -3, 3]} intensity={1.5} color="#f7768e" />
