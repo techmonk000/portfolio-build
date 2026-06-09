@@ -151,7 +151,7 @@ function ArchScene() {
 export default function CyberOSArch() {
   return (
     <Canvas
-      camera={{ position: [0, 0, 6.2], fov: 46 }}
+      camera={{ position: [0, 0, 6.8], fov: 48 }}
       gl={{ antialias: true, alpha: true }}
       style={{ background: "transparent", width: "100%", height: "100%" }}
       dpr={[1, 1.5]}
